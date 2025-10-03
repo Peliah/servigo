@@ -1,12 +1,13 @@
 import { z } from "zod";
-import { idSchema, dateStringSchema, timeSlotSchema } from "./shared-schema";
+import { idSchema } from "./shared-schema";
 
-export const requestStatusEnum = z.enum([
-  "pending",
-  "accepted",
-  "rejected",
-  "completed",
-  "cancelled",
+export const serviceRequestStatusSchema = z.enum([
+  'pending',
+  'accepted',
+  'rejected',
+  'in_progress',
+  'completed',
+  'cancelled'
 ]);
 
 export const serviceRequestSchema = z.object({
@@ -14,22 +15,19 @@ export const serviceRequestSchema = z.object({
   client_id: idSchema,
   technician_id: idSchema,
   service_id: idSchema,
-  request_status: requestStatusEnum,
-  scheduled_date: dateStringSchema,
-  scheduled_time_slot: timeSlotSchema, // "09:00-11:00"
-  client_address: z.string().min(1),
+  status: serviceRequestStatusSchema.default('pending'),
+  preferred_date: z.coerce.date(),
+  preferred_time: z.string().min(1),
+  actual_date: z.coerce.date().optional(),
+  actual_time: z.string().optional(),
+  job_address: z.string().min(1),
   problem_description: z.string().min(1),
-  transport_fee: z.number().nonnegative(),
-  transport_fee_paid: z.boolean().default(false),
-  created_at: z.coerce.date(),
-
-  accepted_at: z.coerce.date().optional(),
-  started_at: z.coerce.date().optional(),
-  completed_at: z.coerce.date().optional(),
-  cancelled_at: z.coerce.date().optional(),
-  cancelled_by: z.enum(["client", "technician", "system"]).optional(),
-  cancel_reason: z.string().optional(),
+  estimated_duration: z.number().positive(), // in minutes
+  total_cost: z.number().nonnegative().optional(),
+  notes: z.string().optional(),
+  created_at: z.coerce.date().default(() => new Date()),
+  updated_at: z.coerce.date().default(() => new Date()),
 });
 
-export type RequestStatus = z.infer<typeof requestStatusEnum>;
 export type ServiceRequest = z.infer<typeof serviceRequestSchema>;
+export type ServiceRequestStatus = z.infer<typeof serviceRequestStatusSchema>;

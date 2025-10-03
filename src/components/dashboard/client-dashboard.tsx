@@ -10,6 +10,7 @@ import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { Client } from "@/schemas/user-schema";
 import { TechnicianSearch } from "@/components/search/technician-search";
+import { BookingHistory } from "@/components/booking/booking-history";
 import {
     Search,
     Heart,
@@ -344,21 +345,7 @@ export function ClientDashboard() {
                     </TabsContent>
 
                     <TabsContent value="bookings">
-                        <div className="bg-white/80 backdrop-blur-sm rounded-2xl shadow-lg border border-white/20 p-6">
-                            <div className="text-center py-12">
-                                <div className="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-6">
-                                    <Calendar className="w-10 h-10 text-green-600" />
-                                </div>
-                                <h3 className="text-xl font-semibold text-gray-900 mb-2">Your Bookings</h3>
-                                <p className="text-gray-600 mb-6">
-                                    Track and manage all your service appointments
-                                </p>
-                                <Button className="bg-green-600 hover:bg-green-700 text-white shadow-lg">
-                                    <Calendar className="w-4 h-4 mr-2" />
-                                    View Bookings
-                                </Button>
-                            </div>
-                        </div>
+                        <BookingHistory />
                     </TabsContent>
 
                     <TabsContent value="profile">

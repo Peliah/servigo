@@ -9,6 +9,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { SearchApiSimulation, SearchFilters, SearchResult } from '@/lib/search-api-simulation';
 import { CategoriesApiSimulation } from '@/lib/technician-api-simulation';
 import { ServiceCategory } from '@/schemas/category-schema';
+import { BookingForm } from '@/components/booking/booking-form';
 import {
     Search,
     MapPin,
@@ -16,7 +17,8 @@ import {
     DollarSign,
     Heart,
     Briefcase,
-    Phone
+    Phone,
+    Calendar
 } from 'lucide-react';
 
 export function TechnicianSearch() {
@@ -223,6 +225,7 @@ interface TechnicianCardProps {
 function TechnicianCard({ result }: TechnicianCardProps) {
     const { technician, services, service_areas, average_rating, total_reviews, distance_km } = result;
     const [isFavorited, setIsFavorited] = useState(false);
+    const [showBookingForm, setShowBookingForm] = useState(false);
 
     const handleFavoriteToggle = () => {
         setIsFavorited(!isFavorited);
@@ -332,15 +335,48 @@ function TechnicianCard({ result }: TechnicianCardProps) {
 
                 {/* Actions */}
                 <div className="flex space-x-2 pt-2">
-                    <Button size="sm" className="flex-1 bg-blue-600 hover:bg-blue-700 text-white">
+                    <Button
+                        size="sm"
+                        className="flex-1 bg-green-600 hover:bg-green-700 text-white"
+                        onClick={() => setShowBookingForm(true)}
+                    >
+                        <Calendar className="w-4 h-4 mr-1" />
+                        Book Now
+                    </Button>
+                    <Button size="sm" variant="outline" className="flex-1">
                         <Phone className="w-4 h-4 mr-1" />
                         Contact
                     </Button>
-                    <Button size="sm" variant="outline" className="flex-1">
-                        View Profile
-                    </Button>
                 </div>
             </CardContent>
+
+            {/* Booking Form Modal */}
+            {showBookingForm && (
+                <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+                    <div className="bg-white rounded-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+                        <div className="p-6">
+                            <div className="flex justify-between items-center mb-4">
+                                <h2 className="text-xl font-semibold">Book Service</h2>
+                                <Button
+                                    variant="outline"
+                                    size="sm"
+                                    onClick={() => setShowBookingForm(false)}
+                                >
+                                    ×
+                                </Button>
+                            </div>
+                            <BookingForm
+                                technician={technician}
+                                onSuccess={() => {
+                                    setShowBookingForm(false);
+                                    // TODO: Show success message
+                                }}
+                                onCancel={() => setShowBookingForm(false)}
+                            />
+                        </div>
+                    </div>
+                </div>
+            )}
         </Card>
     );
 }

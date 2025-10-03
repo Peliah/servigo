@@ -12,6 +12,7 @@ import { Technician } from "@/schemas/user-schema";
 import { ProfileCompletionForm } from "@/components/technician/profile/profile-completion-form";
 import { ServiceManagement } from "@/components/technician/services/service-management";
 import { WorkingHoursManager } from "@/components/technician/availability/working-hours-manager";
+import { BookingQueue } from "@/components/booking/booking-queue";
 import { initializeTechnicianData, TechnicianApiSimulation } from "@/lib/technician-api-simulation";
 import { TechnicianService } from "@/schemas/technician-service-schema";
 import {
@@ -26,7 +27,8 @@ import {
     Calendar,
     TrendingUp,
     Users,
-    AlertCircle
+    AlertCircle,
+    MessageSquare
 } from "lucide-react";
 
 export function TechnicianDashboard() {
@@ -263,7 +265,7 @@ export function TechnicianDashboard() {
                 {/* Main Content Tabs */}
                 <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
                     <div className="bg-white/80 backdrop-blur-sm rounded-2xl shadow-lg border border-white/20 p-2">
-                        <TabsList className="grid w-full grid-cols-4 bg-transparent">
+                        <TabsList className="grid w-full grid-cols-5 bg-transparent">
                             <TabsTrigger
                                 value="overview"
                                 className="data-[state=active]:bg-white data-[state=active]:shadow-md rounded-xl"
@@ -271,6 +273,15 @@ export function TechnicianDashboard() {
                                 <div className="flex items-center space-x-2">
                                     <User className="w-4 h-4" />
                                     <span>Overview</span>
+                                </div>
+                            </TabsTrigger>
+                            <TabsTrigger
+                                value="bookings"
+                                className="data-[state=active]:bg-white data-[state=active]:shadow-md rounded-xl"
+                            >
+                                <div className="flex items-center space-x-2">
+                                    <MessageSquare className="w-4 h-4" />
+                                    <span>Bookings</span>
                                 </div>
                             </TabsTrigger>
                             <TabsTrigger
@@ -400,6 +411,10 @@ export function TechnicianDashboard() {
                                 </CardContent>
                             </Card>
                         )}
+                    </TabsContent>
+
+                    <TabsContent value="bookings">
+                        <BookingQueue technician={technician} />
                     </TabsContent>
 
                     <TabsContent value="services">
