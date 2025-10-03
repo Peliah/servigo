@@ -84,7 +84,7 @@ export function TechnicianCalendar({ technician }: TechnicianCalendarProps) {
       const calendarEvents: CalendarEvent[] = [];
 
       for (const day of days) {
-        const dayRequests = requests.filter(request => 
+        const dayRequests = requests.filter(request =>
           isSameDay(new Date(request.preferred_date), day)
         );
 
@@ -215,19 +215,17 @@ export function TechnicianCalendar({ technician }: TechnicianCalendarProps) {
                   return (
                     <div
                       key={event.date.toISOString()}
-                      className={`min-h-[100px] p-2 border rounded-lg cursor-pointer transition-colors ${
-                        isToday
+                      className={`min-h-[100px] p-2 border rounded-lg cursor-pointer transition-colors ${isToday
                           ? 'bg-blue-50 border-blue-200'
                           : isSelected
-                          ? 'bg-gray-50 border-gray-300'
-                          : 'bg-white border-gray-200 hover:bg-gray-50'
-                      }`}
+                            ? 'bg-gray-50 border-gray-300'
+                            : 'bg-white border-gray-200 hover:bg-gray-50'
+                        }`}
                       onClick={() => setSelectedDate(event.date)}
                     >
                       <div className="flex justify-between items-start mb-2">
-                        <span className={`text-sm font-medium ${
-                          isToday ? 'text-blue-600' : 'text-gray-900'
-                        }`}>
+                        <span className={`text-sm font-medium ${isToday ? 'text-blue-600' : 'text-gray-900'
+                          }`}>
                           {format(event.date, 'd')}
                         </span>
                         {hasRequests && (
@@ -267,7 +265,7 @@ export function TechnicianCalendar({ technician }: TechnicianCalendarProps) {
                   <h3 className="font-semibold text-gray-900 mb-3">
                     {format(selectedDate, 'EEEE, MMMM d, yyyy')}
                   </h3>
-                  
+
                   {(() => {
                     const selectedEvent = events.find(e => isSameDay(e.date, selectedDate));
                     if (!selectedEvent) return null;
@@ -281,11 +279,10 @@ export function TechnicianCalendar({ technician }: TechnicianCalendarProps) {
                             {selectedEvent.availability.map(slot => (
                               <div
                                 key={slot.time}
-                                className={`text-xs p-2 rounded text-center ${
-                                  slot.available
+                                className={`text-xs p-2 rounded text-center ${slot.available
                                     ? 'bg-green-100 text-green-800'
                                     : 'bg-red-100 text-red-800'
-                                }`}
+                                  }`}
                               >
                                 {slot.time}
                               </div>
