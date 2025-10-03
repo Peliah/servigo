@@ -1,7 +1,6 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -9,12 +8,15 @@ import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Calendar } from '@/components/ui/calendar';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { BookingApiSimulation, AvailabilitySlot } from '@/lib/booking-api-simulation';
 import { Technician } from '@/schemas/user-schema';
 import { TechnicianService } from '@/schemas/technician-service-schema';
+import { ServiceRequest } from '@/schemas/service-request-schema';
+import { PaymentForm } from '@/components/payment/payment-form';
 import { useAuthStore } from '@/stores/auth-store';
 import { format } from 'date-fns';
-import { CalendarIcon, Clock, MapPin, DollarSign, AlertCircle, CheckCircle } from 'lucide-react';
+import { CalendarIcon, Clock, MapPin, DollarSign, AlertCircle, CheckCircle, CreditCard, Loader2 } from 'lucide-react';
 
 interface BookingFormProps {
     technician: Technician;
@@ -35,6 +37,8 @@ export function BookingForm({ technician, onSuccess, onCancel }: BookingFormProp
     const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState('');
     const [success, setSuccess] = useState('');
+    const [showPayment, setShowPayment] = useState(false);
+    const [createdRequest, setCreatedRequest] = useState<ServiceRequest | null>(null);
 
     // Load technician's services
     useEffect(() => {
@@ -106,10 +110,8 @@ export function BookingForm({ technician, onSuccess, onCancel }: BookingFormProp
             });
 
             if (response.success && response.data) {
-                setSuccess('Booking request submitted successfully!');
-                setTimeout(() => {
-                    onSuccess?.(response.data!.request_id);
-                }, 2000);
+                setCreatedRequest(response.data);
+                setShowPayment(true);
             } else {
                 setError(response.error || 'Failed to create booking request');
             }
@@ -125,19 +127,31 @@ export function BookingForm({ technician, onSuccess, onCancel }: BookingFormProp
         return (selectedService.base_service_fee_estimate || 0) + (selectedService.transport_fee || 0);
     };
 
+    const handlePaymentSuccess = () => {
+        setSuccess('Booking request submitted and payment processed successfully!');
+        setTimeout(() => {
+            onSuccess?.(createdRequest!.request_id);
+        }, 2000);
+    };
+
+    const handlePaymentCancel = () => {
+        setShowPayment(false);
+        setCreatedRequest(null);
+    };
+
     return (
-        <div className="max-w-2xl mx-auto p-6">
-            <Card className="bg-white/80 backdrop-blur-sm border-white/20 shadow-lg">
-                <CardHeader>
-                    <CardTitle className="flex items-center space-x-2">
+        <Dialog open={true} onOpenChange={onCancel}>
+            <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+                <DialogHeader>
+                    <DialogTitle className="flex items-center space-x-2">
                         <Clock className="w-5 h-5 text-blue-600" />
                         <span>Book Service with {technician.first_name} {technician.last_name}</span>
-                    </CardTitle>
+                    </DialogTitle>
                     <p className="text-sm text-gray-600">
                         {technician.business_name} • {technician.years_of_experience} years experience
                     </p>
-                </CardHeader>
-                <CardContent>
+                </DialogHeader>
+                <div className="space-y-6">
                     <form onSubmit={handleSubmit} className="space-y-6">
                         {/* Service Selection */}
                         <div className="space-y-2">
@@ -313,7 +327,17 @@ export function BookingForm({ technician, onSuccess, onCancel }: BookingFormProp
                                 disabled={isLoading || !selectedService || !selectedDate || !selectedTime}
                                 className="flex-1 bg-blue-600 hover:bg-blue-700 text-white"
                             >
-                                {isLoading ? 'Submitting...' : 'Submit Booking Request'}
+                                {isLoading ? (
+                                    <>
+                                        <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                                        Submitting...
+                                    </>
+                                ) : (
+                                    <>
+                                        <CreditCard className="w-4 h-4 mr-2" />
+                                        Submit Booking & Pay
+                                    </>
+                                )}
                             </Button>
                             {onCancel && (
                                 <Button
@@ -327,8 +351,25 @@ export function BookingForm({ technician, onSuccess, onCancel }: BookingFormProp
                             )}
                         </div>
                     </form>
-                </CardContent>
-            </Card>
-        </div>
+                </div>
+
+                {/* Payment Dialog */}
+                <Dialog open={showPayment} onOpenChange={setShowPayment}>
+                    <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+                        <DialogHeader>
+                            <DialogTitle>Complete Payment</DialogTitle>
+                        </DialogHeader>
+                        {createdRequest && (
+                            <PaymentForm
+                                serviceRequest={createdRequest}
+                                technician={technician}
+                                onSuccess={handlePaymentSuccess}
+                                onCancel={handlePaymentCancel}
+                            />
+                        )}
+                    </DialogContent>
+                </Dialog>
+            </DialogContent>
+        </Dialog>
     );
 }

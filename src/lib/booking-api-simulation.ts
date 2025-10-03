@@ -209,6 +209,15 @@ export class BookingApiSimulation {
                 wh.is_available
             );
 
+            // Debug logging
+            console.log('Availability Debug:', {
+                technicianId,
+                date,
+                dayOfWeek,
+                availableWorkingHours: workingHours.length,
+                allWorkingHours: DUMMY_WORKING_HOURS.filter(wh => wh.technician_id === technicianId)
+            });
+
             if (workingHours.length === 0) {
                 return {
                     success: true,
@@ -236,7 +245,7 @@ export class BookingApiSimulation {
                 const requests = JSON.parse(localStorage.getItem('servigo_service_requests') || '[]');
                 const isBooked = requests.some((req: ServiceRequest) =>
                     req.technician_id === technicianId &&
-                    req.preferred_date.toISOString().split('T')[0] === date &&
+                    new Date(req.preferred_date).toISOString().split('T')[0] === date &&
                     req.preferred_time === timeString &&
                     ['pending', 'accepted', 'in_progress'].includes(req.status)
                 );

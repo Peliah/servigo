@@ -35,7 +35,7 @@ export function ServiceManagement() {
       // Load services and categories in parallel
       const [servicesResponse, categoriesResponse] = await Promise.all([
         TechnicianApiSimulation.getServices(user.user_id),
-        CategoriesApiSimulation.getAll(),
+        CategoriesApiSimulation.getCategories(),
       ]);
 
       if (servicesResponse.success) {
@@ -67,7 +67,7 @@ export function ServiceManagement() {
 
     try {
       const response = await TechnicianApiSimulation.addService(user.user_id, serviceData);
-      
+
       if (response.success) {
         setServices(prev => [...prev, response.data]);
         setShowAddForm(false);
@@ -82,9 +82,9 @@ export function ServiceManagement() {
   const handleUpdateService = async (serviceId: string, updates: Partial<TechnicianService>) => {
     try {
       const response = await TechnicianApiSimulation.updateService(serviceId, updates);
-      
+
       if (response.success) {
-        setServices(prev => prev.map(service => 
+        setServices(prev => prev.map(service =>
           service.service_id === serviceId ? response.data : service
         ));
       } else {
@@ -98,7 +98,7 @@ export function ServiceManagement() {
   const handleDeleteService = async (serviceId: string) => {
     try {
       const response = await TechnicianApiSimulation.updateService(serviceId, { is_active: false });
-      
+
       if (response.success) {
         setServices(prev => prev.filter(service => service.service_id !== serviceId));
       } else {
@@ -143,7 +143,7 @@ export function ServiceManagement() {
                 Manage your service offerings and pricing
               </p>
             </div>
-            <Button 
+            <Button
               onClick={() => setShowAddForm(true)}
               disabled={showAddForm}
             >

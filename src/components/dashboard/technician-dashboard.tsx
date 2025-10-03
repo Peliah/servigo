@@ -13,6 +13,8 @@ import { ProfileCompletionForm } from "@/components/technician/profile/profile-c
 import { ServiceManagement } from "@/components/technician/services/service-management";
 import { WorkingHoursManager } from "@/components/technician/availability/working-hours-manager";
 import { BookingQueue } from "@/components/booking/booking-queue";
+import { TechnicianCalendar } from "@/components/calendar/technician-calendar";
+import { PaymentStatus } from "@/components/payment/payment-status";
 import { initializeTechnicianData, TechnicianApiSimulation } from "@/lib/technician-api-simulation";
 import { TechnicianService } from "@/schemas/technician-service-schema";
 import {
@@ -28,7 +30,9 @@ import {
     TrendingUp,
     Users,
     AlertCircle,
-    MessageSquare
+    MessageSquare,
+    CalendarDays,
+    CreditCard
 } from "lucide-react";
 
 export function TechnicianDashboard() {
@@ -265,7 +269,7 @@ export function TechnicianDashboard() {
                 {/* Main Content Tabs */}
                 <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
                     <div className="bg-white/80 backdrop-blur-sm rounded-2xl shadow-lg border border-white/20 p-2">
-                        <TabsList className="grid w-full grid-cols-5 bg-transparent">
+                        <TabsList className="grid w-full grid-cols-7 bg-transparent">
                             <TabsTrigger
                                 value="overview"
                                 className="data-[state=active]:bg-white data-[state=active]:shadow-md rounded-xl"
@@ -273,6 +277,15 @@ export function TechnicianDashboard() {
                                 <div className="flex items-center space-x-2">
                                     <User className="w-4 h-4" />
                                     <span>Overview</span>
+                                </div>
+                            </TabsTrigger>
+                            <TabsTrigger
+                                value="calendar"
+                                className="data-[state=active]:bg-white data-[state=active]:shadow-md rounded-xl"
+                            >
+                                <div className="flex items-center space-x-2">
+                                    <CalendarDays className="w-4 h-4" />
+                                    <span>Calendar</span>
                                 </div>
                             </TabsTrigger>
                             <TabsTrigger
@@ -300,6 +313,15 @@ export function TechnicianDashboard() {
                                 <div className="flex items-center space-x-2">
                                     <Clock className="w-4 h-4" />
                                     <span>Availability</span>
+                                </div>
+                            </TabsTrigger>
+                            <TabsTrigger
+                                value="payments"
+                                className="data-[state=active]:bg-white data-[state=active]:shadow-md rounded-xl"
+                            >
+                                <div className="flex items-center space-x-2">
+                                    <CreditCard className="w-4 h-4" />
+                                    <span>Payments</span>
                                 </div>
                             </TabsTrigger>
                             <TabsTrigger
@@ -413,6 +435,10 @@ export function TechnicianDashboard() {
                         )}
                     </TabsContent>
 
+                    <TabsContent value="calendar">
+                        <TechnicianCalendar technician={technician} />
+                    </TabsContent>
+
                     <TabsContent value="bookings">
                         <BookingQueue technician={technician} />
                     </TabsContent>
@@ -427,6 +453,10 @@ export function TechnicianDashboard() {
                         <div className="bg-white/80 backdrop-blur-sm rounded-2xl shadow-lg border border-white/20 p-6">
                             <WorkingHoursManager />
                         </div>
+                    </TabsContent>
+
+                    <TabsContent value="payments">
+                        <PaymentStatus technician={technician} />
                     </TabsContent>
 
                     <TabsContent value="profile">
