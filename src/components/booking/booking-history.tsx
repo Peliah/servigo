@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -36,45 +36,45 @@ export function BookingHistory() {
     const [selectedRequest, setSelectedRequest] = useState<ServiceRequest | null>(null);
 
     // Load data
-    useEffect(() => {
-        const loadData = async () => {
-            if (!user || user.user_type !== 'client') return;
+    const loadData = useCallback(async () => {
+        if (!user || user.user_type !== 'client') return;
 
-            setIsLoading(true);
-            setError('');
+        setIsLoading(true);
+        setError('');
 
-            try {
-                // Load technicians and services
-                const [{ DUMMY_TECHNICIANS }, { DUMMY_SERVICES }] = await Promise.all([
-                    import('@/data/dummy-users'),
-                    import('@/data/dummy-services')
-                ]);
+        try {
+            // Load technicians and services
+            const [{ DUMMY_TECHNICIANS }, { DUMMY_SERVICES }] = await Promise.all([
+                import('@/data/dummy-users'),
+                import('@/data/dummy-services')
+            ]);
 
-                setTechnicians(DUMMY_TECHNICIANS);
-                setServices(DUMMY_SERVICES);
+            setTechnicians(DUMMY_TECHNICIANS);
+            setServices(DUMMY_SERVICES);
 
-                // Load client's requests
-                const filters: BookingFilters = {
-                    client_id: user.user_id,
-                    pagination: { page: 1, limit: 50 }
-                };
+            // Load client's requests
+            const filters: BookingFilters = {
+                client_id: user.user_id,
+                pagination: { page: 1, limit: 50 }
+            };
 
-                const response = await BookingApiSimulation.getServiceRequests(filters);
+            const response = await BookingApiSimulation.getServiceRequests(filters);
 
-                if (response.success && response.data) {
-                    setRequests(response.data);
-                } else {
-                    setError(response.error || 'Failed to load booking history');
-                }
-            } catch {
-                setError('An unexpected error occurred');
-            } finally {
-                setIsLoading(false);
+            if (response.success && response.data) {
+                setRequests(response.data);
+            } else {
+                setError(response.error || 'Failed to load booking history');
             }
-        };
-
-        loadData();
+        } catch {
+            setError('An unexpected error occurred');
+        } finally {
+            setIsLoading(false);
+        }
     }, [user]);
+
+    useEffect(() => {
+        loadData();
+    }, [loadData]);
 
     const getTechnicianName = (technicianId: string) => {
         const technician = technicians.find(t => t.user_id === technicianId);
@@ -152,24 +152,6 @@ export function BookingHistory() {
         }
     };
 
-    const handleSubmitReview = async (rating: number, comment: string) => {
-        if (!selectedRequest) return;
-
-        // TODO: Implement review submission API
-        console.log('Submitting review:', {
-            requestId: selectedRequest.request_id,
-            technicianId: selectedRequest.technician_id,
-            rating,
-            comment
-        });
-
-        // For now, just show success message
-        alert(`Review submitted successfully! Rating: ${rating}/5`);
-
-        // Close modal and reset state
-        setShowReviewModal(false);
-        setSelectedRequest(null);
-    };
 
     if (!user || user.user_type !== 'client') {
         return (
@@ -360,19 +342,26 @@ export function BookingHistory() {
             </Card>
 
             {/* Review Modal */}
-            {showReviewModal && selectedRequest && (
-                <ReviewModal
-                    isOpen={showReviewModal}
-                    onClose={() => {
-                        setShowReviewModal(false);
-                        setSelectedRequest(null);
-                    }}
-                    technicianName={getTechnicianName(selectedRequest.technician_id)}
-                    serviceTitle={getServiceTitle(selectedRequest.service_id)}
-                    requestId={selectedRequest.request_id}
-                    onSubmit={handleSubmitReview}
-                />
-            )}
+            {showReviewModal && selectedRequest && (() => {
+                const technician = technicians.find(t => t.user_id === selectedRequest.technician_id);
+                return technician ? (
+                    <ReviewModal
+                        isOpen={showReviewModal}
+                        onClose={() => {
+                            setShowReviewModal(false);
+                            setSelectedRequest(null);
+                        }}
+                        serviceRequest={selectedRequest}
+                        technician={technician}
+                        onSuccess={() => {
+                            setShowReviewModal(false);
+                            setSelectedRequest(null);
+                            // Reload requests to show updated review status
+                            loadData();
+                        }}
+                    />
+                ) : null;
+            })()}
         </div>
     );
 }

@@ -15,6 +15,7 @@ import { WorkingHoursManager } from "@/components/technician/availability/workin
 import { BookingQueue } from "@/components/booking/booking-queue";
 import { TechnicianCalendar } from "@/components/calendar/technician-calendar";
 import { PaymentStatus } from "@/components/payment/payment-status";
+import { ServiceHistory } from "@/components/history/service-history";
 import { initializeTechnicianData, TechnicianApiSimulation } from "@/lib/technician-api-simulation";
 import { TechnicianService } from "@/schemas/technician-service-schema";
 import {
@@ -32,7 +33,8 @@ import {
     AlertCircle,
     MessageSquare,
     CalendarDays,
-    CreditCard
+    CreditCard,
+    History
 } from "lucide-react";
 
 export function TechnicianDashboard() {
@@ -269,7 +271,7 @@ export function TechnicianDashboard() {
                 {/* Main Content Tabs */}
                 <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
                     <div className="bg-white/80 backdrop-blur-sm rounded-2xl shadow-lg border border-white/20 p-2">
-                        <TabsList className="grid w-full grid-cols-7 bg-transparent">
+                        <TabsList className="grid w-full grid-cols-8 bg-transparent">
                             <TabsTrigger
                                 value="overview"
                                 className="data-[state=active]:bg-white data-[state=active]:shadow-md rounded-xl"
@@ -322,6 +324,15 @@ export function TechnicianDashboard() {
                                 <div className="flex items-center space-x-2">
                                     <CreditCard className="w-4 h-4" />
                                     <span>Payments</span>
+                                </div>
+                            </TabsTrigger>
+                            <TabsTrigger
+                                value="history"
+                                className="data-[state=active]:bg-white data-[state=active]:shadow-md rounded-xl"
+                            >
+                                <div className="flex items-center space-x-2">
+                                    <History className="w-4 h-4" />
+                                    <span>History</span>
                                 </div>
                             </TabsTrigger>
                             <TabsTrigger
@@ -457,6 +468,10 @@ export function TechnicianDashboard() {
 
                     <TabsContent value="payments">
                         <PaymentStatus technician={technician} />
+                    </TabsContent>
+
+                    <TabsContent value="history">
+                        <ServiceHistory userType="technician" />
                     </TabsContent>
 
                     <TabsContent value="profile">

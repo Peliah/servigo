@@ -11,6 +11,7 @@ import { useEffect, useState } from "react";
 import { Client } from "@/schemas/user-schema";
 import { TechnicianSearch } from "@/components/search/technician-search";
 import { BookingHistory } from "@/components/booking/booking-history";
+import { ServiceHistory } from "@/components/history/service-history";
 import {
     Search,
     Heart,
@@ -24,7 +25,8 @@ import {
     Settings,
     MessageSquare,
     TrendingUp,
-    Filter
+    Filter,
+    History
 } from "lucide-react";
 
 export function ClientDashboard() {
@@ -189,7 +191,7 @@ export function ClientDashboard() {
                 {/* Main Content Tabs */}
                 <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
                     <div className="bg-white/80 backdrop-blur-sm rounded-2xl shadow-lg border border-white/20 p-2">
-                        <TabsList className="grid w-full grid-cols-5 bg-transparent">
+                        <TabsList className="grid w-full grid-cols-6 bg-transparent">
                             <TabsTrigger
                                 value="overview"
                                 className="data-[state=active]:bg-white data-[state=active]:shadow-md rounded-xl"
@@ -224,6 +226,15 @@ export function ClientDashboard() {
                                 <div className="flex items-center space-x-2">
                                     <Calendar className="w-4 h-4" />
                                     <span>Bookings</span>
+                                </div>
+                            </TabsTrigger>
+                            <TabsTrigger
+                                value="history"
+                                className="data-[state=active]:bg-white data-[state=active]:shadow-md rounded-xl"
+                            >
+                                <div className="flex items-center space-x-2">
+                                    <History className="w-4 h-4" />
+                                    <span>History</span>
                                 </div>
                             </TabsTrigger>
                             <TabsTrigger
@@ -346,6 +357,10 @@ export function ClientDashboard() {
 
                     <TabsContent value="bookings">
                         <BookingHistory />
+                    </TabsContent>
+
+                    <TabsContent value="history">
+                        <ServiceHistory userType="client" />
                     </TabsContent>
 
                     <TabsContent value="profile">
